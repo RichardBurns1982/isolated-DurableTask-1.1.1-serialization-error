@@ -3,6 +3,8 @@ using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.DurableTask;
 using Microsoft.DurableTask.Client;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace FunctionAppOrchestrationSandbox
@@ -47,6 +49,21 @@ namespace FunctionAppOrchestrationSandbox
             [ActivityTrigger] string message, 
             CancellationToken cancellationToken = default)
         {
+            var parentMessage = JsonNode.Parse(message);
+            var childMessage = JsonNode.Parse(parentMessage[nameof(ParentMessage.Child)].ToString());
+            var childMessageType = childMessage[nameof(BaseMessage.MessageType)].ToString();
+
+            if (Enum.TryParse<MessageTypeEnum>(childMessageType, out var messageType))
+            {
+                switch (messageType)
+                {
+                    case MessageTypeEnum.Child:
+                        var child = JsonSerializer.Deserialize<ChildMessage>(childMessage.ToString());
+                        _logger.LogInformation($"Processing child message {child.Message}.");
+                        break;
+                }
+            }
+
             _logger.LogInformation($"Processing message {message}.");
             return Task.CompletedTask;
         }
