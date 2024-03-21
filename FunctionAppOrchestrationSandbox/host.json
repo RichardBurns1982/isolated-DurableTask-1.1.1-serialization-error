@@ -1,0 +1,15 @@
+{
+	"version": "2.0",
+	"extensions": {
+		"durableTask": {
+			"hubName": "Sandbox1"
+		}
+	},
+	"functionTimeout": "00:04:59",
+	"logging": {
+		"logLevel": {
+			"default": "Warning",
+			"Smartwyre": "Information"
+		}
+	}
+}
